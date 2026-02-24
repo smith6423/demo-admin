@@ -1,6 +1,7 @@
 "use client";
 import { styled, Container, Box } from "@mui/material";
-import React, { useState, Activity } from "react";
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Header from "@/app/(DashboardLayout)/layout/header/Header";
 import Sidebar from "@/app/(DashboardLayout)/layout/sidebar/Sidebar";
 
@@ -19,17 +20,24 @@ const PageWrapper = styled("div")(() => ({
   backgroundColor: "transparent",
 }));
 
-interface Props {
-  children: React.ReactNode;
-}
-
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const router = useRouter();
   const [isSidebarOpen, setSidebarOpen] = useState(true);
   const [isMobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    const hasSession = document.cookie
+      .split(";")
+      .some((c) => c.trim().startsWith("session_id="));
+    if (!hasSession) {
+      router.replace("/authentication/login");
+    }
+  }, [router]);
+
   return (
     <MainWrapper className="mainwrapper">
       {/* ------------------------------------------- */}

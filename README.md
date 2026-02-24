@@ -1,39 +1,179 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Modernize Next.js Admin Dashboard
 
-## Getting Started
+Next.js 기반의 관리자 대시보드입니다.
 
-First, run the development server:
+## 기술 스택
+
+| 분류 | 기술 |
+|------|------|
+| Framework | Next.js 16 |
+| Language | TypeScript |
+| UI | MUI (Material UI) v7 |
+| ORM | Prisma 7 |
+| Database | PostgreSQL (Supabase) |
+| Session Store | Redis (ioredis) |
+| Package Manager | Yarn Berry 4 |
+
+## 시작하기
+
+### 1. 패키지 설치
+
+```bash
+yarn install
+```
+
+### 2. Redis 실행
+
+Docker로 로컬 Redis를 실행합니다.
+
+```bash
+docker run -d --name redis -p 6379:6379 redis
+```
+
+### 3. 환경변수 설정
+
+`.env.local` 파일을 생성하고 아래 값을 설정합니다.
+
+```env
+# Database (Supabase PostgreSQL)
+DATABASE_URL="postgresql://[user]:[password]@[host]:[port]/[database]"
+
+# Redis
+REDIS_URL="redis://localhost:6379"
+
+# 시드 관리자 계정 (선택사항 - 기본값 사용 시 생략 가능)
+SEED_ADMIN_EMAIL=admin@admin.com
+SEED_ADMIN_PASSWORD=변경할비밀번호
+```
+
+### 4. DB 마이그레이션
+
+```bash
+# Prisma 클라이언트 타입 생성
+yarn db:generate
+
+# 테이블 생성
+yarn db:migrate --name init
+
+# 초기 데이터 입력 (roles + 관리자 계정)
+yarn db:seed
+```
+
+### 5. 개발 서버 실행
 
 ```bash
 yarn dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`http://localhost:3000` 에서 확인할 수 있습니다.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+> `/` 접근 시 세션이 없으면 `/authentication/login` 으로 자동 리다이렉트됩니다.
+> 기본 관리자 계정: `admin@admin.com` / `admin123!`
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+## 인증 구조
 
-## Learn More
+next-auth 없이 Redis 세션 방식으로 구현합니다 (Spring Boot JSession 유사).
 
-To learn more about Next.js, take a look at the following resources:
+```
+POST /api/auth/login
+  → Prisma로 사용자 조회 + bcrypt 검증
+  → Redis에 세션 저장: session:{uuid} (TTL 24h)
+  → 쿠키에 session_id 발급 (httpOnly)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+미들웨어 (Edge)
+  → 쿠키 존재 여부만 확인 → 없으면 /authentication/login 리다이렉트
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+Server Component
+  → getServerSession() → Redis에서 세션 조회 → 사용자 정보 반환
 
-## Deploy on Vercel
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+POST /api/auth/logout
+  → Redis에서 세션 즉시 삭제
+  → 쿠키 삭제
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+## 데이터베이스
 
-## claude 
-CLAUDE.md (Role) 
-└── 항상 활성화, 프로젝트 전체 컨텍스트, 우리 팀 개발 문화
-    ├── Skills (How)
-    │   └── "어떻게 할지" 절차 정의, 팀 내 작업 매뉴얼
-    │       반복 작업의 표준화
-    └── Subagents (Who)
-        └── "누가 할지" 전문가 분리, 전문 팀원
-            컨텍스트 효율화 + 전문성 강화
+### 스키마
+
+**roles** — 사용자 권한
+
+| 컬럼 | 타입 | 설명 |
+|------|------|------|
+| id | String (cuid) | PK |
+| name | String (unique) | 역할명 (ADMIN / USER / GUEST) |
+| description | String? | 역할 설명 |
+| createdAt | DateTime | 생성일 |
+| updatedAt | DateTime | 수정일 |
+
+**users** — 사용자
+
+| 컬럼 | 타입 | 설명 |
+|------|------|------|
+| id | String (cuid) | PK |
+| email | String (unique) | 이메일 |
+| name | String | 이름 |
+| password | String | bcrypt 해시 비밀번호 |
+| isActive | Boolean | 활성 여부 (기본값: true) |
+| roleId | String | FK → roles.id |
+| deletedAt | DateTime? | 소프트 삭제 일시 |
+| createdAt | DateTime | 생성일 |
+| updatedAt | DateTime | 수정일 |
+
+### 초기 데이터 (Seed)
+
+| 역할 | 이메일 | 설명 |
+|------|--------|------|
+| ADMIN | admin@admin.com | 관리자 계정 |
+| USER | — | 일반 사용자 권한 |
+| GUEST | — | 게스트 권한 |
+
+## 스크립트
+
+```bash
+yarn dev              # 개발 서버 실행
+yarn build            # 프로덕션 빌드
+yarn start            # 프로덕션 서버 실행
+yarn lint             # ESLint 검사
+
+yarn db:migrate       # DB 마이그레이션 실행
+yarn db:generate      # Prisma 클라이언트 타입 생성
+yarn db:seed          # 초기 데이터 입력
+yarn db:push          # 마이그레이션 없이 스키마 동기화 (개발용)
+yarn db:studio        # Prisma Studio (DB GUI)
+```
+
+## 프로젝트 구조
+
+```
+package/
+├── prisma/
+│   ├── schema.prisma       # DB 스키마 정의
+│   ├── seed.ts             # 초기 데이터 스크립트
+│   └── migrations/         # 마이그레이션 이력
+├── src/
+│   ├── app/
+│   │   ├── api/
+│   │   │   └── auth/
+│   │   │       ├── login/route.ts   # POST 로그인 API
+│   │   │       └── logout/route.ts  # POST 로그아웃 API
+│   │   ├── authentication/          # 로그인 페이지
+│   │   └── (DashboardLayout)/       # 대시보드 레이아웃
+│   ├── generated/
+│   │   └── prisma/         # Prisma 자동 생성 클라이언트 (git 제외)
+│   ├── lib/
+│   │   ├── prisma.ts       # PrismaClient 싱글톤
+│   │   ├── redis.ts        # Redis 싱글톤 (ioredis)
+│   │   ├── session.ts      # 세션 CRUD (Redis)
+│   │   ├── cookie.ts       # httpOnly 쿠키 헬퍼
+│   │   └── getServerSession.ts  # Server Component 세션 헬퍼
+│   └── middleware.ts       # Edge 라우트 보호
+├── prisma.config.ts        # Prisma 7 설정
+└── .env.local              # 환경변수 (git 제외)
+```
+
+## 주의사항
+
+- `src/generated/` 는 자동 생성 파일이므로 git에 포함되지 않습니다. 클론 후 반드시 `yarn db:generate` 를 실행하세요.
+- `password` 필드는 항상 bcrypt로 해시된 값을 저장합니다. 쿼리 시 `select`에 포함하지 마세요.
+- 소프트 삭제를 사용하므로 목록 조회 시 반드시 `where: { deletedAt: null }` 조건을 포함하세요.
+- Redis가 실행 중이지 않으면 로그인이 동작하지 않습니다. 개발 시 Docker Redis가 먼저 실행되어야 합니다.

@@ -1,0 +1,72 @@
+// Prisma Schema
+// DB: PostgreSQL
+// Conventions:
+//   - All models have createdAt / updatedAt audit fields
+//   - Soft-deletable models have deletedAt DateTime?
+//   - Sensitive fields are annotated with /// @omit
+//   - All FK fields have @@index to prevent full-table scans
+//   - Enums are used for every status / type / role field
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ---------------------------------------------------------------------------
+// Role
+// ---------------------------------------------------------------------------
+model Role {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+
+  // Audit fields
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  users       User[]
+
+  @@map("roles")
+}
+
+// ---------------------------------------------------------------------------
+// User
+// ---------------------------------------------------------------------------
+model User {
+  id        String    @id @default(cuid())
+  email     String    @unique
+  name      String
+
+  /// @omit — never include in select unless performing authentication
+  password  String
+
+  isActive  Boolean   @default(true)
+
+  // Soft delete — all queries must filter WHERE deletedAt IS NULL
+  deletedAt DateTime?
+
+  // FK
+  roleId    String
+  role      Role      @relation(fields: [roleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  // Audit fields
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  // Indexes
+  // roleId    — FK, required to avoid full-table scan on role-based lookups
+  // isActive  — admin list views filter by active status
+  // deletedAt — soft-delete filter on every list query
+  // email     — covered by @unique, no extra index needed
+  @@index([roleId])
+  @@index([isActive])
+  @@index([deletedAt])
+  @@index([roleId, isActive])       // composite: filter active users by role
+
+  @@map("users")
+}

@@ -6,7 +6,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "db:migrate": "prisma migrate dev",
+    "db:generate": "prisma generate",
+    "db:studio": "prisma studio",
+    "db:push": "prisma db push",
+    "db:seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
     "@emotion/cache": "^11.14.0",
@@ -16,13 +21,20 @@
     "@mui/icons-material": "^7.3.5",
     "@mui/lab": "^7.0.1-beta.19",
     "@mui/material": "^7.3.5",
+    "@prisma/adapter-pg": "^7.4.1",
+    "@prisma/client": "^7.4.1",
     "@tabler/icons-react": "^3.35.0",
     "@types/node": "^24.10.1",
+    "@types/pg": "^8.16.0",
     "apexcharts": "5.3.6",
+    "bcryptjs": "^3.0.3",
     "eslint": "9.39.1",
     "eslint-config-next": "16.0.3",
+    "ioredis": "^5.9.3",
     "lodash": "^4.17.21",
     "next": "^16.0.3",
+    "pg": "^8.18.0",
+    "prisma": "^7.4.1",
     "react": "^19.2.0",
     "react-apexcharts": "1.8.0",
     "react-dom": "^19.2.0",
@@ -31,10 +43,12 @@
     "typescript": "5.9.3"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^3.0.0",
     "@types/lodash": "4.17.20",
     "@types/react": "^19.2.6",
     "@types/react-dom": "^19.2.3",
-    "@types/react-syntax-highlighter": "^15.5.13"
+    "@types/react-syntax-highlighter": "^15.5.13",
+    "tsx": "^4.21.0"
   },
   "packageManager": "yarn@4.12.0"
 }

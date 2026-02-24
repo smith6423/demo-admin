@@ -1,4 +1,4 @@
-"use client";
+import React, { Suspense } from "react";
 import Link from "next/link";
 import { Grid, Box, Card, Stack, Typography } from "@mui/material";
 // components
@@ -38,8 +38,9 @@ const Login2 = () => {
               xs: 12,
               sm: 12,
               lg: 4,
-              xl: 3
-            }}>
+              xl: 3,
+            }}
+          >
             <Card
               elevation={9}
               sx={{ p: 4, zIndex: 1, width: "100%", maxWidth: "500px" }}
@@ -47,45 +48,47 @@ const Login2 = () => {
               <Box display="flex" alignItems="center" justifyContent="center">
                 <Logo />
               </Box>
-              <AuthLogin
-                subtext={
-                  <Typography
-                    variant="subtitle1"
-                    textAlign="center"
-                    color="textSecondary"
-                    mb={1}
-                  >
-                    Your Social Campaigns
-                  </Typography>
-                }
-                subtitle={
-                  <Stack
-                    direction="row"
-                    spacing={1}
-                    justifyContent="center"
-                    mt={3}
-                  >
+              <Suspense>
+                <AuthLogin
+                  subtext={
                     <Typography
+                      variant="subtitle1"
+                      textAlign="center"
                       color="textSecondary"
-                      variant="h6"
-                      fontWeight="500"
+                      mb={1}
                     >
-                      New to Modernize?
+                      Your Social Campaigns
                     </Typography>
-                    <Typography
-                      component={Link}
-                      href="/authentication/register"
-                      fontWeight="500"
-                      sx={{
-                        textDecoration: "none",
-                        color: "primary.main",
-                      }}
+                  }
+                  subtitle={
+                    <Stack
+                      direction="row"
+                      spacing={1}
+                      justifyContent="center"
+                      mt={3}
                     >
-                      Create an account
-                    </Typography>
-                  </Stack>
-                }
-              />
+                      <Typography
+                        color="textSecondary"
+                        variant="h6"
+                        fontWeight="500"
+                      >
+                        New to Modernize?
+                      </Typography>
+                      <Typography
+                        component={Link}
+                        href="/authentication/register"
+                        fontWeight="500"
+                        sx={{
+                          textDecoration: "none",
+                          color: "primary.main",
+                        }}
+                      >
+                        Create an account
+                      </Typography>
+                    </Stack>
+                  }
+                />
+              </Suspense>
             </Card>
           </Grid>
         </Grid>
