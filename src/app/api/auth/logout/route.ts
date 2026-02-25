@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server'
-import { getSessionId, clearSessionCookie } from '@/lib/cookie'
-import { deleteSession } from '@/lib/session'
+import { getSessionId, clearSessionCookie, deleteSession } from '@/shared/lib'
 
 export async function POST() {
   try {

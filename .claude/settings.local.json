@@ -2,7 +2,11 @@
   "permissions": {
     "allow": [
       "Bash(cd /c/work/admin/Modernize-Nextjs-Free/package && yarn add ioredis 2>&1)",
-      "Bash(head:*)"
+      "Bash(head:*)",
+      "WebSearch",
+      "Bash(tail:*)",
+      "Bash(grep failed with:*)",
+      "Bash(cd:*)"
     ]
   }
 }
