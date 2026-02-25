@@ -1,3 +1,4 @@
+"use client";
 
 import DashboardCard from '@/app/(DashboardLayout)/components/shared/DashboardCard';
 import {

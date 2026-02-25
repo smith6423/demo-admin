@@ -1,3 +1,5 @@
+"use client";
+
 import React from 'react';
 import { Select, MenuItem } from '@mui/material';
 import { useTheme } from '@mui/material/styles';

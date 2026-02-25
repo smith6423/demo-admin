@@ -1,3 +1,5 @@
+"use client";
+
 import { useMediaQuery, Box, Drawer } from "@mui/material";
 import SidebarItems from "./SidebarItems";
 
