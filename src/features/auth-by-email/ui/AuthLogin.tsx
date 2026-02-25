@@ -3,12 +3,14 @@ import React, { useState } from "react";
 import {
   Box,
   Typography,
-  FormGroup,
-  FormControlLabel,
   Button,
   Stack,
-  Checkbox,
   Alert,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
 } from "@mui/material";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -25,7 +27,15 @@ const AuthLogin = ({ title, subtitle, subtext }: loginType) => {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [otp, setOtp] = useState("");
+  const [showOtpDialog, setShowOtpDialog] = useState(false)
+  const [showRegisterDialog, setShowRegisterDialog] = useState(false)
+  const [registerSecret, setRegisterSecret] = useState<string | null>(null)
+  const [qrDataUrl, setQrDataUrl] = useState<string | null>(null)
+  const [regToken, setRegToken] = useState("")
   const [error, setError] = useState<string | null>(null);
+  const [registerError, setRegisterError] = useState<string | null>(null);
+  const [otpError, setOtpError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -40,19 +50,78 @@ const AuthLogin = ({ title, subtitle, subtext }: loginType) => {
         body: JSON.stringify({ email, password }),
       });
 
-      if (res.ok) {
+      const data = await res.json()
+      if (res.ok && data.user) {
         router.push("/");
         router.refresh();
+      } else if (data.requiresOtp) {
+        setShowOtpDialog(true)
+      } else if (data.needsOtpRegistration) {
+        // start registration flow: request secret via public endpoint
+        const gen = await fetch('/api/auth/otp/generate-public', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) })
+        const gdata = await gen.json()
+        if (gen.ok && gdata.base32) {
+          setRegisterSecret(gdata.base32)
+          // build QR DataURL client-side
+          try {
+            const QRCode = (await import('qrcode')).default
+            const dataUrl = await QRCode.toDataURL(gdata.otpauth_url, { width: 200 })
+            setQrDataUrl(dataUrl)
+          } catch (e) {
+            console.error('QR 생성 실패', e)
+          }
+          setShowRegisterDialog(true)
+        } else {
+          setError(gdata.message || 'OTP 생성 실패')
+        }
       } else {
-        const data = await res.json();
-        setError(data.message ?? "로그인에 실패했습니다.");
+        setError(data.message ?? "로그인에 실패했습니다.")
       }
-    } catch {
+    } catch (e) {
+      console.error(e)
       setError("네트워크 오류가 발생했습니다.");
     } finally {
       setIsLoading(false);
     }
   };
+
+  const handleOtpSubmit = async () => {
+    setIsLoading(true)
+    setOtpError(null)
+    try {
+      const res = await fetch('/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password, otp }) })
+      if (res.ok) {
+        setShowOtpDialog(false)
+        setOtpError(null)
+        router.push('/')
+        router.refresh()
+      } else {
+        const data = await res.json()
+        setOtpError(data.message || '유효하지 않은 OTP입니다.')
+      }
+    } catch (e) {
+      setOtpError('네트워크 오류')
+    } finally { setIsLoading(false) }
+  }
+
+  const handleRegisterConfirm = async () => {
+    if (!registerSecret) return setRegisterError('시크릿 없음')
+    setIsLoading(true)
+    setRegisterError(null)
+    try {
+      const res = await fetch('/api/auth/otp/verify-public', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password, token: regToken, secret: registerSecret }) })
+      const data = await res.json()
+      if (res.ok) {
+        setShowRegisterDialog(false)
+        setRegisterError(null)
+        setError('OTP 등록 완료 — 다시 로그인 해주세요')
+      } else {
+        setRegisterError(data.message || '유효하지 않은 OTP입니다.')
+      }
+    } catch (e) {
+      setRegisterError('네트워크 오류')
+    } finally { setIsLoading(false) }
+  }
 
   return (
     <form onSubmit={handleSubmit}>
@@ -92,7 +161,7 @@ const AuthLogin = ({ title, subtitle, subtext }: loginType) => {
             }
           />
         </Box>
-        <Box mt="25px">
+        <Box my="25px">
           <Typography
             variant="subtitle1"
             fontWeight={600}
@@ -113,30 +182,7 @@ const AuthLogin = ({ title, subtitle, subtext }: loginType) => {
             }
           />
         </Box>
-        <Stack
-          justifyContent="space-between"
-          direction="row"
-          alignItems="center"
-          my={2}
-        >
-          <FormGroup>
-            <FormControlLabel
-              control={<Checkbox defaultChecked />}
-              label="Remeber this Device"
-            />
-          </FormGroup>
-          <Typography
-            component={Link}
-            href="/"
-            fontWeight="500"
-            sx={{
-              textDecoration: "none",
-              color: "primary.main",
-            }}
-          >
-            Forgot Password ?
-          </Typography>
-        </Stack>
+        {/* OTP is handled in modal dialogs */}
       </Stack>
       <Box>
         <Button
@@ -151,6 +197,32 @@ const AuthLogin = ({ title, subtitle, subtext }: loginType) => {
         </Button>
       </Box>
       {subtitle}
+
+      <Dialog open={showOtpDialog} onClose={() => { setShowOtpDialog(false); setOtpError(null); }}>
+        <DialogTitle>Enter OTP</DialogTitle>
+        <DialogContent>
+          {otpError && <Alert severity="error" sx={{ mt: 2 }}>{otpError}</Alert>}
+          <TextField label="OTP" value={otp} onChange={(e) => setOtp(e.target.value)} fullWidth sx={{ mt: 2 }} />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => { setShowOtpDialog(false); setOtpError(null); }}>취소</Button>
+          <Button onClick={handleOtpSubmit} variant="contained">확인</Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={showRegisterDialog} onClose={() => { setShowRegisterDialog(false); setRegisterError(null); }} maxWidth="sm" fullWidth>
+        <DialogTitle>Register OTP</DialogTitle>
+        <DialogContent>
+          {qrDataUrl && <Box sx={{ textAlign: 'center' }}><img src={qrDataUrl} alt="qr" style={{ width: 200, height: 200 }} /></Box>}
+          {registerSecret && <Typography variant="body2" sx={{ mt: 1 }}>Secret: {registerSecret}</Typography>}
+          {registerError && <Alert severity="error" sx={{ mt: 2 }}>{registerError}</Alert>}
+          <TextField label="OTP 코드" value={regToken} onChange={(e) => setRegToken(e.target.value)} fullWidth sx={{ mt: 2 }} />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => { setShowRegisterDialog(false); setRegisterError(null); }}>취소</Button>
+          <Button onClick={handleRegisterConfirm} variant="contained">등록</Button>
+        </DialogActions>
+      </Dialog>
     </form>
   );
 };

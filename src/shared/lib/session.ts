@@ -7,7 +7,8 @@ export interface SessionUser {
   role: string
 }
 
-const SESSION_TTL = 86400 // 24 hours
+// Increase session TTL to match cookie maxAge (24 hours)
+const SESSION_TTL = 86400 // 24 Hours in seconds
 
 export async function createSession(userId: string, user: SessionUser): Promise<string> {
   const sessionId = crypto.randomUUID()

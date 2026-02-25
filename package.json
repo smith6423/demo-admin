@@ -35,11 +35,13 @@
     "next": "^16.0.3",
     "pg": "^8.18.0",
     "prisma": "^7.4.1",
+    "qrcode": "^1.5.1",
     "react": "^19.2.0",
     "react-apexcharts": "1.8.0",
     "react-dom": "^19.2.0",
     "react-mui-sidebar": "^1.6.10",
     "react-syntax-highlighter": "^16.1.0",
+    "speakeasy": "^2.0.0",
     "typescript": "5.9.3"
   },
   "devDependencies": {

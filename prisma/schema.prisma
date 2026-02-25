@@ -47,6 +47,10 @@ model User {
 
   isActive  Boolean   @default(true)
 
+  /// Two-factor (TOTP) support
+  isTwoFactorEnabled Boolean @default(false)
+  totpSecret         String?
+
   // Soft delete — all queries must filter WHERE deletedAt IS NULL
   deletedAt DateTime?
 
