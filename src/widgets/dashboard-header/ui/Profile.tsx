@@ -12,8 +12,8 @@ import {
   ListItemText,
 } from "@mui/material";
 import { useRouter } from "next/navigation";
-
 import { IconListCheck, IconMail, IconUser } from "@tabler/icons-react";
+import { authApi } from "@/shared/api";
 
 const Profile = () => {
   const router = useRouter();
@@ -26,7 +26,7 @@ const Profile = () => {
   };
 
   const handleLogout = async () => {
-    await fetch("/api/auth/logout", { method: "POST" });
+    await authApi.logout();
     router.push("/authentication/login");
   };
 

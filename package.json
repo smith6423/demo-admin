@@ -18,6 +18,7 @@
     "@emotion/react": "^11.14.0",
     "@emotion/server": "^11.11.0",
     "@emotion/styled": "^11.14.1",
+    "@hookform/resolvers": "^5.2.2",
     "@mui/icons-material": "^7.3.5",
     "@mui/lab": "^7.0.1-beta.19",
     "@mui/material": "^7.3.5",
@@ -39,17 +40,21 @@
     "react": "^19.2.0",
     "react-apexcharts": "1.8.0",
     "react-dom": "^19.2.0",
+    "react-hook-form": "^7.71.2",
     "react-mui-sidebar": "^1.6.10",
     "react-syntax-highlighter": "^16.1.0",
     "speakeasy": "^2.0.0",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@types/bcryptjs": "^3.0.0",
     "@types/lodash": "4.17.20",
+    "@types/qrcode": "^1.5.6",
     "@types/react": "^19.2.6",
     "@types/react-dom": "^19.2.3",
     "@types/react-syntax-highlighter": "^15.5.13",
+    "@types/speakeasy": "^2.0.10",
     "tsx": "^4.21.0"
   },
   "packageManager": "yarn@4.12.0"

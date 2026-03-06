@@ -17,6 +17,50 @@ datasource db {
 }
 
 // ---------------------------------------------------------------------------
+// Permission — 페이지/API 단위 권한 정의
+// ---------------------------------------------------------------------------
+model Permission {
+  id          String   @id @default(cuid())
+  // 예: "users:read", "users:write", "roles:manage", "logs:read"
+  code        String   @unique
+  name        String
+  description String?
+  // 권한 분류 (page | api)
+  type        PermissionType @default(PAGE)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  rolePermissions RolePermission[]
+
+  @@map("permissions")
+}
+
+enum PermissionType {
+  PAGE
+  API
+}
+
+// ---------------------------------------------------------------------------
+// RolePermission — Role ↔ Permission N:M
+// ---------------------------------------------------------------------------
+model RolePermission {
+  id           String     @id @default(cuid())
+  roleId       String
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permissionId String
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  createdAt    DateTime   @default(now())
+
+  @@unique([roleId, permissionId])
+  @@index([roleId])
+  @@index([permissionId])
+
+  @@map("role_permissions")
+}
+
+// ---------------------------------------------------------------------------
 // Role
 // ---------------------------------------------------------------------------
 model Role {
@@ -29,7 +73,8 @@ model Role {
   updatedAt   DateTime @updatedAt
 
   // Relations
-  users       User[]
+  users           User[]
+  rolePermissions RolePermission[]
 
   @@map("roles")
 }
@@ -51,6 +96,24 @@ model User {
   isTwoFactorEnabled Boolean @default(false)
   totpSecret         String?
 
+  // ISMS: 비밀번호 정책
+  /// @omit
+  passwordChangedAt  DateTime  @default(now())
+  mustChangePassword Boolean   @default(false)
+
+  // ISMS: 로그인 실패 잠금 (비밀번호 기준)
+  loginFailCount     Int       @default(0)
+  lockedAt           DateTime?
+
+  // ISMS: 마지막 로그인 일시 / 장기 미사용 잠금
+  lastLoginAt        DateTime?
+
+  // ISMS: 비밀번호 이력 (재사용 방지)
+  passwordHistory    PasswordHistory[]
+
+  // ISMS: 접속 로그
+  accessLogs         AccessLog[]
+
   // Soft delete — all queries must filter WHERE deletedAt IS NULL
   deletedAt DateTime?
 
@@ -63,14 +126,67 @@ model User {
   updatedAt DateTime  @updatedAt
 
   // Indexes
-  // roleId    — FK, required to avoid full-table scan on role-based lookups
-  // isActive  — admin list views filter by active status
-  // deletedAt — soft-delete filter on every list query
-  // email     — covered by @unique, no extra index needed
   @@index([roleId])
   @@index([isActive])
   @@index([deletedAt])
-  @@index([roleId, isActive])       // composite: filter active users by role
+  @@index([roleId, isActive])
+  @@index([lastLoginAt])
+  @@index([lockedAt])
 
   @@map("users")
+}
+
+// ---------------------------------------------------------------------------
+// PasswordHistory — ISMS 비밀번호 재사용 방지 (최근 N개 이력 보관)
+// ---------------------------------------------------------------------------
+model PasswordHistory {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  /// @omit
+  password  String
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([userId, createdAt])
+
+  @@map("password_histories")
+}
+
+// ---------------------------------------------------------------------------
+// AccessLog — ISMS 접속 로그 (2년 보관)
+// ---------------------------------------------------------------------------
+model AccessLog {
+  id        String          @id @default(cuid())
+
+  // nullable: 로그인 실패 시 userId가 없을 수 있음
+  userId    String?
+  user      User?           @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  email     String
+  action    AccessLogAction
+  success   Boolean
+  ipAddress String?
+  userAgent String?
+
+  createdAt DateTime        @default(now())
+
+  @@index([userId])
+  @@index([email])
+  @@index([action])
+  @@index([createdAt])
+  @@index([userId, createdAt])
+
+  @@map("access_logs")
+}
+
+enum AccessLogAction {
+  LOGIN
+  LOGOUT
+  LOGIN_FAILED
+  ACCOUNT_LOCKED
+  PASSWORD_CHANGED
+  SESSION_EXPIRED
 }

@@ -19,11 +19,12 @@ const PageWrapper = styled("div")(() => ({
   backgroundColor: "transparent",
 }));
 
-export default function DashboardLayout({
-  children,
-}: {
+interface Props {
   children: React.ReactNode;
-}) {
+  permissions: string[];
+}
+
+export default function DashboardLayout({ children, permissions }: Props) {
   const [isSidebarOpen, setSidebarOpen] = useState(true);
   const [isMobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
@@ -33,6 +34,7 @@ export default function DashboardLayout({
         isSidebarOpen={isSidebarOpen}
         isMobileSidebarOpen={isMobileSidebarOpen}
         onSidebarClose={() => setMobileSidebarOpen(false)}
+        permissions={permissions}
       />
 
       <PageWrapper className="page-wrapper">

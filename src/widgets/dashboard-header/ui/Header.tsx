@@ -1,11 +1,10 @@
 "use client";
 
-import React from 'react';
-import { Box, AppBar, Toolbar, styled, Stack, IconButton, Badge, Button } from '@mui/material';
-import PropTypes from 'prop-types';
-import Link from 'next/link';
-import Profile from './Profile';
+import { AppBar, Badge, Box, IconButton, Toolbar, styled } from '@mui/material';
 import { IconBellRinging, IconMenu } from '@tabler/icons-react';
+import PropTypes from 'prop-types';
+import React from 'react';
+import Profile from './Profile';
 
 interface ItemType {
   toggleMobileSidebar:  (event: React.MouseEvent<HTMLElement>) => void;
@@ -58,12 +57,7 @@ const Header = ({toggleMobileSidebar}: ItemType) => {
 
         </IconButton>
         <Box flexGrow={1} />
-        <Stack spacing={1} direction="row" alignItems="center">
-          <Button variant="contained" component={Link} href="/authentication/login"   disableElevation color="primary" >
-            Login
-          </Button>
-          <Profile />
-        </Stack>
+        <Profile />
       </ToolbarStyled>
     </AppBarStyled>
   );

@@ -1,5 +1,9 @@
 import { DashboardLayout } from '@/widgets/dashboard-layout';
+import { getServerSession } from '@/shared/lib';
 
-export default function Layout({ children }: { children: React.ReactNode }) {
-  return <DashboardLayout>{children}</DashboardLayout>;
+export default async function Layout({ children }: { children: React.ReactNode }) {
+  const session = await getServerSession();
+  const permissions = session?.permissions ?? [];
+
+  return <DashboardLayout permissions={permissions}>{children}</DashboardLayout>;
 }

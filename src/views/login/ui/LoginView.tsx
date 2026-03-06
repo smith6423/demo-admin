@@ -1,10 +1,10 @@
 "use client";
 
-import React, { Suspense } from "react";
-import Link from "next/link";
-import { Grid, Box, Card, Stack, Typography } from "@mui/material";
-import { PageContainer, Logo } from "@/shared/ui";
 import { AuthLogin } from "@/features/auth-by-email";
+import { Logo, PageContainer } from "@/shared/ui";
+import { Box, Card, Grid, Stack, Typography } from "@mui/material";
+import Link from "next/link";
+import { Suspense } from "react";
 
 const LoginView = () => {
   return (

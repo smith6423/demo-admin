@@ -6,8 +6,7 @@ import {
   YearlyBreakup,
   MonthlyEarnings,
   RecentTransactions,
-  ProductPerformance,
-  Blog,
+  ProductPerformance
 } from '@/widgets/dashboard-overview';
 
 const DashboardView = () => {
@@ -49,9 +48,6 @@ const DashboardView = () => {
               lg: 8
             }}>
             <ProductPerformance />
-          </Grid>
-          <Grid size={12}>
-            <Blog />
           </Grid>
         </Grid>
       </Box>

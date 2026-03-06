@@ -3,18 +3,18 @@
 import { useMediaQuery, Box, Drawer } from "@mui/material";
 import SidebarItems from "./SidebarItems";
 
-
-
 interface ItemType {
   isMobileSidebarOpen: boolean;
   onSidebarClose: (event: React.MouseEvent<HTMLElement>) => void;
   isSidebarOpen: boolean;
+  permissions: string[];
 }
 
 const MSidebar = ({
   isMobileSidebarOpen,
   onSidebarClose,
   isSidebarOpen,
+  permissions,
 }: ItemType) => {
   const lgUp = useMediaQuery((theme: any) => theme.breakpoints.up("lg"));
 
@@ -23,14 +23,12 @@ const MSidebar = ({
   const scrollbarStyles = {
     '&::-webkit-scrollbar': {
       width: '7px',
-
     },
     '&::-webkit-scrollbar-thumb': {
       backgroundColor: '#eff2f7',
       borderRadius: '15px',
     },
   };
-
 
   if (lgUp) {
     return (
@@ -54,18 +52,13 @@ const MSidebar = ({
             }
           }}
         >
-          <Box
-            sx={{
-              height: "100%",
-            }}
-          >
-
+          <Box sx={{ height: "100%" }}>
             <Box>
-              <SidebarItems />
+              <SidebarItems permissions={permissions} />
             </Box>
           </Box>
         </Drawer>
-      </Box >
+      </Box>
     );
   }
 
@@ -75,7 +68,6 @@ const MSidebar = ({
       open={isMobileSidebarOpen}
       onClose={onSidebarClose}
       variant="temporary"
-
       slotProps={{
         paper: {
           sx: {
@@ -86,7 +78,7 @@ const MSidebar = ({
       }}
     >
       <Box>
-        <SidebarItems />
+        <SidebarItems permissions={permissions} />
       </Box>
     </Drawer>
   );
