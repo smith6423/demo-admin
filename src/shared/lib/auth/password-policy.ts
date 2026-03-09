@@ -36,12 +36,10 @@ function hasKeyboardSequence(password: string, minLen = 4): boolean {
   return false
 }
 
+
 function hasRepeatedChars(password: string, maxRepeat = 3): boolean {
-  for (let i = 0; i <= password.length - maxRepeat; i++) {
-    const chunk = password.slice(i, i + maxRepeat)
-    if ([...chunk].every((c) => c === chunk[0])) return true
-  }
-  return false
+  const regex = new RegExp(`(.)\\1{${maxRepeat - 1},}`)
+  return regex.test(password)
 }
 
 export function validatePasswordPolicy(password: string): PasswordPolicyResult {

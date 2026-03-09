@@ -36,6 +36,13 @@ const Menuitems: MenuItem[] = [
     href: "/",
     requiredPermission: "dashboard:view",
   },
+  {
+    id: uniqueId(),
+    title: "내 정보",
+    icon: IconClipboardList,
+    href: "/my/info",
+    requiredPermission: "my:info",
+  },
 
   // ── 관리자 전용 ─────────────────────────────────────────
   {

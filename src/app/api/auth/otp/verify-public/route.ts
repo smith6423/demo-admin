@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
 import speakeasy from 'speakeasy'
 import { prisma } from '@/shared/lib'
-import { encryptSecret } from '@/shared/lib/crypto'
-import { incrementFailure, isBlocked, resetFailures } from '@/shared/lib/bruteforce'
+import { encryptSecret } from '@/shared/lib/auth/crypto'
+import { incrementFailure, isBlocked, resetFailures } from '@/shared/lib/auth/bruteforce'
 
 export async function POST(req: NextRequest) {
   try {

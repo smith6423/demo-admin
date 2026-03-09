@@ -76,7 +76,7 @@ const RoleManagementView = () => {
       const res = await fetch(`/api/admin/roles/${selectedRole.id}/permissions`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ permissionIds: [...checkedIds] }),
+        body: JSON.stringify({ permissionIds: Array.from(checkedIds) }),
       });
       if (res.ok) {
         setSnackbar({ open: true, message: '권한이 저장되었습니다.', severity: 'success' });
@@ -96,7 +96,7 @@ const RoleManagementView = () => {
     <PageContainer title="권한 관리" description="역할별 페이지 및 API 권한 관리">
       <Grid container spacing={3}>
         {/* 역할 목록 */}
-        <Grid item xs={12} md={4}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <DashboardCard title="역할 목록" subtitle="역할을 선택하여 권한을 관리하세요">
             {loading ? (
               <Box display="flex" justifyContent="center" py={4}>
@@ -153,7 +153,7 @@ const RoleManagementView = () => {
         </Grid>
 
         {/* 권한 편집 패널 */}
-        <Grid item xs={12} md={8}>
+        <Grid size={{ xs: 12, md: 8 }}>
           <DashboardCard
             title={selectedRole ? `${selectedRole.name} 권한 설정` : '역할 선택'}
             subtitle={selectedRole ? `권한을 선택 후 저장하세요 (${checkedIds.size}개 선택됨)` : '좌측에서 역할을 선택하세요'}
@@ -199,7 +199,7 @@ const RoleManagementView = () => {
                     </Stack>
                     <Grid container spacing={1}>
                       {pagePermissions.map((p) => (
-                        <Grid item xs={12} sm={6} key={p.id}>
+                        <Grid size={{ xs: 12, sm: 6 }} key={p.id}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -233,7 +233,7 @@ const RoleManagementView = () => {
                     </Stack>
                     <Grid container spacing={1}>
                       {apiPermissions.map((p) => (
-                        <Grid item xs={12} sm={6} key={p.id}>
+                        <Grid size={{ xs: 12, sm: 6 }} key={p.id}>
                           <FormControlLabel
                             control={
                               <Checkbox

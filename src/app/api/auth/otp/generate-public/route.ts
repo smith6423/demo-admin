@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
     if (!valid) return NextResponse.json({ message: '이메일 또는 비밀번호가 올바르지 않습니다.' }, { status: 401 })
 
     // generate secret for registration (do not save yet)
-    const secret = speakeasy.generateSecret({ name: `Modernize (${user.email})` })
+    const secret = speakeasy.generateSecret({ name: `Admin (${user.email})` })
 
     return NextResponse.json({ base32: secret.base32, otpauth_url: secret.otpauth_url })
   } catch (error) {

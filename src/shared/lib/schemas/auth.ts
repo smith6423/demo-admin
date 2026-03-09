@@ -24,11 +24,8 @@ function hasKeyboardSequence(pw: string, minLen = 4): boolean {
 }
 
 function hasRepeatedChars(pw: string, max = 3): boolean {
-  for (let i = 0; i <= pw.length - max; i++) {
-    const chunk = pw.slice(i, i + max)
-    if ([...chunk].every((c) => c === chunk[0])) return true
-  }
-  return false
+  const regex = new RegExp(`(.)\\1{${max - 1},}`)
+  return regex.test(pw);
 }
 
 export const passwordSchema = z

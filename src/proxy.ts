@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { verifyPayload, PAYLOAD_COOKIE_NAME } from '@/shared/lib/session-payload'
+import { verifyPayload, PAYLOAD_COOKIE_NAME } from '@/shared/lib/auth/session-payload'
 
 /**
  * URL 패턴 → 필요한 permission code 매핑
@@ -15,6 +15,9 @@ const ROUTE_PERMISSIONS: Array<{ pattern: RegExp; permission: string | null }> =
   { pattern: /^\/admin\/roles(\/.*)?$/, permission: 'admin:roles' },
   { pattern: /^\/admin\/logs(\/.*)?$/,  permission: 'admin:logs'  },
 
+  // 내 정보 페이지 (모든 로그인 사용자)
+  { pattern: /^\/my\/info$/, permission: 'my:info' },
+
   // 디자인 페이지
   { pattern: /^\/design\/icons$/,       permission: 'design:icons'  },
   { pattern: /^\/design\/sample-page$/, permission: 'design:sample' },
@@ -25,7 +28,7 @@ const ROUTE_PERMISSIONS: Array<{ pattern: RegExp; permission: string | null }> =
   { pattern: /^\/$/, permission: 'dashboard:view' },
 ]
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl
   const isAuthPage = pathname.startsWith('/authentication')
 
@@ -70,3 +73,6 @@ export async function middleware(req: NextRequest) {
 export const config = {
   matcher: ['/((?!api|_next/static|_next/image|favicon.ico|images).*)'],
 }
+
+
+

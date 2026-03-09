@@ -1,4 +1,4 @@
-import { redis } from './redis'
+import { redis } from '../redis'
 
 const DEFAULT_LIMIT = 5
 const DEFAULT_WINDOW = 15 * 60 // 15 minutes

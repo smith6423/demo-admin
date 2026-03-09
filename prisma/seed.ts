@@ -32,6 +32,9 @@ const permissions = [
   { code: 'admin:roles',     name: '권한 관리',         type: 'PAGE' as const, description: '역할별 권한 체크박스 관리' },
   { code: 'admin:logs',      name: '접속 이력 조회',    type: 'PAGE' as const, description: '전체 접속 로그 조회' },
 
+  // 내정보 페이지 (모든 로그인 사용자)
+  { code: 'my:info',        name: '내 정보',           type: 'PAGE' as const, description: '내 정보 조회 및 수정 페이지' },
+
   // 디자인 페이지 (ADMIN, USER)
   { code: 'design:icons',    name: '아이콘',            type: 'PAGE' as const, description: '아이콘 디자인 페이지' },
   { code: 'design:sample',   name: '샘플 페이지',       type: 'PAGE' as const, description: '샘플 페이지' },
@@ -54,12 +57,14 @@ const rolePermissionMap: Record<string, string[]> = {
   ADMIN: [
     'dashboard:view',
     'admin:users', 'admin:roles', 'admin:logs',
+    'my:info',
     'design:icons', 'design:sample', 'design:typo', 'design:shadow',
     'users:read', 'users:write', 'users:unlock', 'users:resetpw',
     'logs:read', 'roles:manage',
   ],
   USER: [
     'dashboard:view',
+    'my:info',
     'design:icons', 'design:sample', 'design:typo', 'design:shadow',
   ],
   GUEST: [

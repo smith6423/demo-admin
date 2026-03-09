@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
 import speakeasy from 'speakeasy'
 import { prisma, createSession, setSessionCookie, setPayloadCookie } from '@/shared/lib'
-import { decryptSecret } from '@/shared/lib/crypto'
-import { incrementFailure, isBlocked, resetFailures } from '@/shared/lib/bruteforce'
+import { decryptSecret } from '@/shared/lib/auth/crypto'
+import { incrementFailure, isBlocked, resetFailures } from '@/shared/lib/auth/bruteforce'
 import { loginSchema } from '@/shared/lib/schemas'
 
 // ISMS: 비밀번호 실패 잠금 임계값
@@ -152,9 +152,9 @@ export async function POST(req: NextRequest) {
     // GUEST 역할은 관리자 승인(역할 변경) 전까지 로그인 차단
     if (user.role.name === 'GUEST') {
       await writeAccessLog({ userId: user.id, email, action: 'LOGIN_FAILED', success: false, ipAddress: ip, userAgent })
-      return NextResponse.json({ guestBlocked: true }, { status: 403 })
+      return NextResponse.json({ message: "관리자 승인 대기 중입니다." }, { status: 403 })
     }
-
+    
     // ISMS: lastLoginAt 업데이트
     await prisma.user.update({
       where: { id: user.id },

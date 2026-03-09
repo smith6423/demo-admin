@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ message: '회원가입이 완료되었습니다. 관리자 승인 후 로그인 가능합니다.' }, { status: 201 })
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ message: error.errors[0]?.message }, { status: 400 })
+      return NextResponse.json({ message: error.message }, { status: 400 })
     }
     console.error('[register] error:', error)
     return NextResponse.json({ message: '서버 오류가 발생했습니다.' }, { status: 500 })

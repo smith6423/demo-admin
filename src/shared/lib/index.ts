@@ -5,13 +5,13 @@ export {
   setPayloadCookie,
   getSessionId,
   clearSessionCookie,
-} from "./cookie";
-export { createSession, getSession, deleteSession } from "./session";
-export type { SessionUser } from "./session";
-export { getServerSession } from "./getServerSession";
+} from "./auth/cookie";
+export { createSession, getSession, deleteSession } from "./auth/session";
+export type { SessionUser } from "./auth/session";
+export { getServerSession } from "./auth/getServerSession";
 export { baselightTheme, plus } from "./theme";
-export { validatePasswordPolicy, isPasswordReused } from "./password-policy";
-export type { PasswordPolicyResult } from "./password-policy";
+export { validatePasswordPolicy, isPasswordReused } from "./auth/password-policy";
+export type { PasswordPolicyResult } from "./auth/password-policy";
 export {
   registerSchema,
   loginSchema,

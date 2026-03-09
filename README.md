@@ -1,4 +1,4 @@
-# Modernize Next.js Admin Dashboard
+# Next.js Admin Dashboard
 
 Next.js 기반의 관리자 대시보드입니다.
 
@@ -72,7 +72,7 @@ yarn dev
 
 ## 인증 구조
 
-next-auth 없이 Redis 세션 방식으로 구현합니다 (Spring Boot JSession 유사).
+Redis 세션 방식으로 구현합니다 (Spring Boot JSession 유사).
 
 ```
 POST /api/auth/login

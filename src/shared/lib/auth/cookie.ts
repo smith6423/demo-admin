@@ -2,16 +2,15 @@ import { cookies } from 'next/headers'
 import { signPayload, PAYLOAD_COOKIE_NAME, type SessionPayload } from './session-payload'
 
 const COOKIE_NAME = 'session_id'
-const COOKIE_MAX_AGE = 10 * 60 // ISMS: 10분 무활동 세션 타임아웃
 
 export async function setSessionCookie(sessionId: string): Promise<void> {
   const cookieStore = await cookies()
-  cookieStore.set(COOKIE_NAME, sessionId, {
+  cookieStore.set(process.env.COOKIE_NAME as string, sessionId, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
     path: '/',
-    maxAge: COOKIE_MAX_AGE,
+    maxAge: process.env.COOKIE_MAX_AGE as number | undefined || 60*10,
   })
 }
 
@@ -24,7 +23,7 @@ export async function setPayloadCookie(payload: SessionPayload): Promise<void> {
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
     path: '/',
-    maxAge: COOKIE_MAX_AGE,
+    maxAge: process.env.COOKIE_MAX_AGE as number | undefined || 60*10,
   })
 }
 

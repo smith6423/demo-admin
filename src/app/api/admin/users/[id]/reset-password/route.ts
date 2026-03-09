@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
 import { prisma, getServerSession } from '@/shared/lib'
-import { validatePasswordPolicy } from '@/shared/lib/password-policy'
+import { validatePasswordPolicy } from '@/shared/lib/auth/password-policy'
 
 // POST /api/admin/users/[id]/reset-password
 // .env의 RESET_PASSWORD 값으로 초기화 후 mustChangePassword = true 설정

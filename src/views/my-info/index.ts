@@ -1,0 +1,1 @@
+export {default as MyInfoView} from './ui/MyInfoView';

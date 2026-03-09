@@ -72,7 +72,7 @@ const LoginView = () => {
                         variant="h6"
                         fontWeight="500"
                       >
-                        New to Modernize?
+                        New to Admin?
                       </Typography>
                       <Typography
                         component={Link}

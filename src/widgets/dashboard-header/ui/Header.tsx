@@ -1,7 +1,7 @@
 "use client";
 
-import { AppBar, Badge, Box, IconButton, Toolbar, styled } from '@mui/material';
-import { IconBellRinging, IconMenu } from '@tabler/icons-react';
+import { AppBar, Box, IconButton, Toolbar, styled } from '@mui/material';
+import { IconMenu } from '@tabler/icons-react';
 import PropTypes from 'prop-types';
 import React from 'react';
 import Profile from './Profile';
@@ -41,20 +41,6 @@ const Header = ({toggleMobileSidebar}: ItemType) => {
           }}
         >
           <IconMenu width="20" height="20" />
-        </IconButton>
-
-
-        <IconButton
-          size="large"
-          aria-label="show 11 new notifications"
-          color="inherit"
-          aria-controls="msgs-menu"
-          aria-haspopup="true"
-        >
-          <Badge variant="dot" color="primary">
-            <IconBellRinging size="21" stroke="1.5" />
-          </Badge>
-
         </IconButton>
         <Box flexGrow={1} />
         <Profile />

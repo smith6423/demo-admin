@@ -112,7 +112,7 @@ const SidebarItems = ({ permissions }: Props) => {
         themeSecondaryColor="#49beff"
       >
         <Logo img="/images/logos/dark-logo.svg" component={Link} to="/">
-          Modernize
+          Admin
         </Logo>
         {renderMenuItems(visibleItems, pathname)}
       </MUI_Sidebar>

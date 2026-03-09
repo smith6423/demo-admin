@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
 import { prisma, getServerSession } from '@/shared/lib'
-import { isPasswordReused } from '@/shared/lib/password-policy'
+import { isPasswordReused } from '@/shared/lib/auth/password-policy'
 import { changePasswordSchema } from '@/shared/lib/schemas'
 
 const PASSWORD_HISTORY_LIMIT = 5
